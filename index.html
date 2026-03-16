@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Ma Paperasse</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#FAF8F5;overflow-x:hidden;font-family:system-ui,-apple-system,sans-serif}
+input,textarea,button{font-family:inherit}
+::-webkit-scrollbar{display:none}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3/dist/htm.umd.js"></script>
+<script>
+var html=htm.bind(React.createElement);
+var useState=React.useState,useEffect=React.useEffect,useRef=React.useRef;
+
+var C={bg:"#FAF8F5",w:"#FFF",cr:"#F3ECE4",cm:"#B8926A",dk:"#1E1C1A",md:"#6B6460",lt:"#A8A099",vl:"#D4CFC9",bd:"#EDE8E3",gn:"#5EA06B",rd:"#C76A52"};
+var cd={background:C.w,border:"1px solid "+C.bd,borderRadius:16,boxShadow:"0 2px 8px rgba(44,40,37,.04)"};
+var btnS={background:C.cm,color:C.w,border:"none",borderRadius:999,padding:"16px",fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"inherit",width:"100%",textAlign:"center"};
+var btnOS={background:"transparent",color:C.cm,border:"1.5px solid "+C.bd,borderRadius:999,padding:"16px",fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"inherit",width:"100%",textAlign:"center"};
+
+var icp={
+file:"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6",
+doc:"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z M14 2v6h6 M16 13H8 M16 17H8",
+home:"M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z",
+car:"M16 3H8l-4 6h16l-4-6z M3 9v6a2 2 0 002 2h14a2 2 0 002-2V9",
+shield:"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+users:"M17 21v-2a4 4 0 00-8 0v2 M9 7a4 4 0 108 0 4 4 0 00-8 0",
+globe:"M12 2a10 10 0 100 20 10 10 0 000-20z M2 12h20",
+heart:"M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z",
+brief:"M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2",
+bank:"M3 21h18 M3 10h18 M12 3l9 7H3l9-7z M5 10v11 M19 10v11",
+scale:"M12 3v18 M5 8l7-5 7 5",
+star:"M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+clock:"M12 2a10 10 0 100 20 10 10 0 000-20z M12 6v6l4 2",
+search:"M21 21l-4.35-4.35 M11 19a8 8 0 100-16 8 8 0 000 16z",
+msg:"M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z",
+user:"M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2 M12 3a4 4 0 100 8 4 4 0 000-8z",
+bell:"M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 01-3.46 0",
+check:"M20 6L9 17l-5-5",
+chev:"M9 18l6-6-6-6",
+back:"M15 18l-6-6 6-6",
+send:"M22 2L11 13 M22 2l-7 20-4-9-9-4 20-7z",
+video:"M23 7l-7 5 7 5V7z M1 5h15v14H1z",
+mic:"M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z M19 10v2a7 7 0 01-14 0v-2",
+screen:"M2 3h20v14H2z M8 21h8 M12 17v4",
+x:"M18 6L6 18 M6 6l12 12",
+grid:"M10 3H3v7h7V3z M21 3h-7v7h7V3z M10 14H3v7h7v-7z M21 14h-7v7h7v-7z",
+swap:"M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"
+};
+
+function Ic(props){return html`<svg width=${props.sz||20} height=${props.sz||20} viewBox="0 0 24 24" fill="none" stroke=${props.cl||C.cm} strokeWidth=${props.sw||1.8} strokeLinecap="round" strokeLinejoin="round"><path d=${props.d}/></svg>`}
+
+var CATS=[
+{id:1,n:"Impôts & Fiscalité",c:42,k:"file"},{id:2,n:"CV & Emploi",c:38,k:"doc"},{id:3,n:"Logement",c:27,k:"home"},
+{id:4,n:"Véhicule",c:19,k:"car"},{id:5,n:"Sécu & CPAM",c:31,k:"shield"},{id:6,n:"CAF & Aides",c:35,k:"users"},
+{id:7,n:"Titre de séjour",c:22,k:"globe"},{id:8,n:"Retraite",c:15,k:"heart"},{id:9,n:"France Travail",c:29,k:"brief"},
+{id:10,n:"Banque",c:18,k:"bank"},{id:11,n:"Famille",c:12,k:"scale"},{id:12,n:"Entreprise",c:17,k:"star"}];
+
+var AA=[
+{id:1,ini:"SL",nm:"Sophie Laurent",sh:"Sophie L.",sp:"Impôts, CAF, Logement",r:4.9,rv:127,ss:340,sat:98,p:20,cl:"#A67B52",on:true,bio:"Ancienne assistante sociale. Je vous accompagne pas à pas.",tg:["Impôts","CAF","Logement"],md:[{m:"Visio",p:20,d:"Partage d'écran, 45 min"},{m:"Tél",p:12,d:"Appel 30 min"},{m:"Chat",p:8,d:"Réponse sous 2h"}],av:[{n:"Julie D.",i:"JD",c:"#8B7666",d:"3j",s:5,t:"Sophie m'a guidée écran par écran."},{n:"Pierre M.",i:"PM",c:"#5C8A84",d:"1sem",s:5,t:"APL bouclé en 45 min."}]},
+{id:2,ini:"MK",nm:"Marie Keller",sh:"Marie K.",sp:"CV, Lettres, Emploi",r:4.8,rv:89,ss:210,sat:96,p:18,cl:"#8B7666",on:false,bio:"Rédactrice professionnelle. CV percutants.",tg:["CV","Lettres"],md:[{m:"Visio",p:18,d:"45 min"},{m:"Chat",p:8,d:"Réponse sous 2h"}],av:[{n:"Lucas R.",i:"LR",c:"#A67B52",d:"5j",s:5,t:"CV transformé en 30 min."}]},
+{id:3,ini:"TD",nm:"Thomas Dubois",sh:"Thomas D.",sp:"Logement, APL",r:4.7,rv:64,ss:150,sat:94,p:20,cl:"#5C8A84",on:true,bio:"Spécialiste dossiers logement et APL.",tg:["Logement","APL"],md:[{m:"Visio",p:20,d:"45 min"},{m:"Tél",p:12,d:"30 min"}],av:[{n:"Nadia C.",i:"NC",c:"#7D6B99",d:"4j",s:5,t:"Dossier APL résolu en une séance."}]},
+{id:4,ini:"AB",nm:"Amina Benali",sh:"Amina B.",sp:"Titre de séjour",r:4.9,rv:52,ss:120,sat:99,p:25,cl:"#7D6B99",on:true,bio:"4 ans d'expérience. Parle arabe, français, anglais.",tg:["Titre de séjour","Nationalité"],md:[{m:"Visio",p:25,d:"45 min"},{m:"Présentiel",p:30,d:"En personne"}],av:[{n:"Omar S.",i:"OS",c:"#A67B52",d:"2j",s:5,t:"Renouvellement sans stress."}]}
+];
+
+var DOSS=[{id:1,title:"Déclaration d'impôts 2025",aid:1,st:"progress",pct:60,next:"Envoi des justificatifs"},{id:2,title:"Renouvellement APL",aid:3,st:"waiting",pct:30,next:"Visio prévue vendredi 15h"}];
+var CONVOS=[{aid:1,msg:"On finalise vendredi !",t:"14:12",u:1},{aid:3,msg:"Votre APL avance bien",t:"Hier",u:0}];
+
+function Av(p){return html`<div style=${{width:p.sz||48,height:p.sz||48,borderRadius:"50%",background:p.cl,display:"flex",alignItems:"center",justifyContent:"center",fontSize:(p.sz||48)*.32,fontWeight:600,color:"#fff",flexShrink:0,position:"relative"}}>${p.ini}${p.on&&html`<div style=${{width:8,height:8,borderRadius:"50%",background:C.gn,border:"2px solid "+C.bg,position:"absolute",bottom:0,right:0}}/>`}</div>`}
+
+function Logo(){return html`<svg width="26" height="26" viewBox="0 0 88 88"><rect x="10" y="6" width="48" height="64" rx="6" fill="none" stroke=${C.cm} strokeWidth="3.5"/><rect x="26" y="14" width="48" height="64" rx="6" fill=${C.cm} fillOpacity=".12" stroke=${C.cm} strokeWidth="3.5"/><line x1="34" y1="30" x2="62" y2="30" stroke=${C.cm} strokeWidth="3" strokeLinecap="round"/><line x1="34" y1="40" x2="58" y2="40" stroke=${C.cm} strokeWidth="3" strokeLinecap="round" opacity=".55"/><line x1="34" y1="50" x2="52" y2="50" stroke=${C.cm} strokeWidth="3" strokeLinecap="round" opacity=".3"/><circle cx="20" cy="62" r="11" fill=${C.cm} fillOpacity=".18"/><polyline points="14,62 18.5,66.5 26,58" fill="none" stroke=${C.cm} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/></svg>`}
+
+function Bar(p){return html`<div style=${{width:"100%",height:4,background:C.bd,borderRadius:2}}><div style=${{width:p.pct+"%",height:"100%",background:C.cm,borderRadius:2}}/></div>`}
+
+function App(){
+var s=useState("onboard"),sc=s[0],setSc=s[1];
+var s2=useState("home"),tab=s2[0],setTab=s2[1];
+var s3=useState(null),cat=s3[0],setCat=s3[1];
+var s4=useState(null),aid=s4[0],setAid2=s4[1];
+var s5=useState(false),isAid=s5[0],setIsAid=s5[1];
+var s6=useState(""),srch=s6[0],setSrch=s6[1];
+var s7=useState(false),showAll=s7[0],setShowAll=s7[1];
+var s8=useState(""),msgTx=s8[0],setMsgTx=s8[1];
+var s9=useState("visio"),mode=s9[0],setMode=s9[1];
+var s10=useState(4),dt=s10[0],setDt=s10[1];
+var s11=useState("15:00"),tm=s11[0],setTm=s11[1];
+var s12=useState(0),stars=s12[0],setStars=s12[1];
+
+var DT=[{d:"Lun",n:17},{d:"Mar",n:18},{d:"Mer",n:19},{d:"Jeu",n:20},{d:"Ven",n:21},{d:"Sam",n:22},{d:"Dim",n:23}];
+var TMS=["9:00","10:00","11:00","14:00","15:00","16:00","17:00","18:00"];
+var dis=["11:00","18:00"];
+
+var go=function(t,d,a){
+if(t==="home"){setSc("home");setTab("home");setCat(null);setIsAid(false)}
+else if(t==="aidDash"){setSc("aidDash");setTab("dash");setIsAid(true)}
+else{if(a)setAid2(a);if(d)setCat(d);setSc(t)}
+};
+
+var cats=srch?CATS.filter(function(c){return c.n.toLowerCase().indexOf(srch.toLowerCase())>=0}):showAll?CATS:CATS.slice(0,6);
+
+// NAV
+function NavBar(){
+var tabs=isAid?[{id:"dash",l:"Tableau",k:"grid"},{id:"messages",l:"Messages",k:"msg"},{id:"profile",l:"Profil",k:"user"}]:[{id:"home",l:"Accueil",k:"home"},{id:"search",l:"Recherche",k:"search"},{id:"messages",l:"Messages",k:"msg"},{id:"profile",l:"Profil",k:"user"}];
+return html`<div style=${{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:430,background:"rgba(250,248,245,.92)",backdropFilter:"blur(20px)",WebkitBackdropFilter:"blur(20px)",borderTop:"1px solid "+C.bd,display:"flex",justifyContent:"space-around",padding:"8px 16px 28px",zIndex:50}}>
+${tabs.map(function(t){return html`<div key=${t.id} onClick=${function(){setTab(t.id);if(isAid){if(t.id==="dash")setSc("aidDash");else if(t.id==="messages")setSc("msgL");else setSc("myProf")}else{if(t.id==="home"){setSc("home");setCat(null)}else if(t.id==="search")setSc("srchT");else if(t.id==="messages")setSc("msgL");else setSc("myProf")}}} style=${{display:"flex",flexDirection:"column",alignItems:"center",gap:3,cursor:"pointer",fontSize:10,fontWeight:500,color:tab===t.id?C.cm:C.lt,padding:"4px 8px"}}><${Ic} d=${icp[t.k]} sz=${21} cl=${tab===t.id?C.cm:C.lt}/>${t.l}</div>`})}
+</div>`}
+
+function ModeBtn(){return html`<div onClick=${function(){if(isAid){setIsAid(false);setTab("home");setSc("home")}else{setIsAid(true);setTab("dash");setSc("aidDash")}}} style=${{display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:999,background:C.cr,cursor:"pointer"}}><${Ic} d=${icp.swap} sz=${14} cl=${isAid?C.gn:C.cm} sw=${2}/><span style=${{fontSize:11,fontWeight:600,color:isAid?C.gn:C.cm}}>${isAid?"Aidant":"Demandeur"}</span></div>`}
+
+// ONBOARDING
+if(sc==="onboard"){
+var s13=useState(0),pg=s13[0],setPg=s13[1];
+if(pg<3){
+var sls=[{t:"Vous galérez avec",b:"la paperasse ?",s:"Trouvez un aidant qui résout votre problème en visio, par téléphone ou en personne."},{t:"Choisissez, réservez,",b:"c'est réglé.",s:"Notes, avis, prix transparents. Vous choisissez en confiance."},{t:"Suivez vos dossiers",b:"en temps réel.",s:"Progression, documents, échéances — tout est centralisé."}];
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,display:"flex",flexDirection:"column",padding:"60px 30px 40px",textAlign:"center"}}>
+<div style=${{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",gap:6}}>${pg===0&&html`<div style=${{marginBottom:16}}><${Logo}/></div>`}<div style=${{fontSize:15,color:C.lt}}>${sls[pg].t}</div><div style=${{fontSize:28,fontWeight:700,color:C.dk}}>${sls[pg].b}</div><div style=${{fontSize:14,color:C.md,marginTop:10,lineHeight:1.6}}>${sls[pg].s}</div></div>
+<div style=${{display:"flex",justifyContent:"center",gap:6,marginBottom:28}}>${[0,1,2].map(function(i){return html`<div key=${i} style=${{width:i===pg?28:8,height:8,borderRadius:4,background:i===pg?C.cm:C.bd}}/>`})}</div>
+<button onClick=${function(){setPg(pg+1)}} style=${btnS}>${pg===2?"Commencer":"Suivant"}</button>
+${pg===0&&html`<div onClick=${function(){setPg(3)}} style=${{marginTop:14,fontSize:13,color:C.lt,cursor:"pointer"}}>J'ai déjà un compte</div>`}
+</div>`}
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,padding:"44px 28px"}}>
+<div style=${{textAlign:"center",marginBottom:32}}><${Logo}/><div style=${{fontSize:22,fontWeight:700,color:C.dk,marginTop:12}}>Créer un compte</div><div style=${{fontSize:13,color:C.md,marginTop:4}}>Gratuit, en 30 secondes</div></div>
+${["Nom complet","Email","Mot de passe"].map(function(l,i){return html`<div key=${i} style=${{marginBottom:16}}><div style=${{fontSize:12,fontWeight:600,color:C.dk,marginBottom:5}}>${l}</div><input type=${i===2?"password":"text"} placeholder=${["Louiza Hadid","louiza@email.com","••••••••"][i]} style=${{width:"100%",padding:"13px 16px",borderRadius:12,border:"1px solid "+C.bd,fontSize:14,fontFamily:"inherit",background:C.w,outline:"none",boxSizing:"border-box"}}/></div>`})}
+<button onClick=${function(){go("home")}} style=${btnS}>Créer mon compte</button>
+<div style=${{textAlign:"center",marginTop:16,fontSize:13,color:C.md}}>Déjà inscrit ? <span onClick=${function(){go("home")}} style=${{color:C.cm,fontWeight:600,cursor:"pointer"}}>Connexion</span></div>
+</div>`}
+
+// HOME
+if(sc==="home"){
+var active=DOSS.filter(function(d){return d.st!=="done"});
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:90}}>
+<div style=${{padding:"18px 24px 0",display:"flex",justifyContent:"space-between",alignItems:"center"}}><div style=${{display:"flex",alignItems:"center",gap:9}}><${Logo}/><div style=${{fontSize:15,fontWeight:700,color:C.dk}}>Ma Paperasse</div></div><div style=${{display:"flex",alignItems:"center",gap:8}}><${ModeBtn}/></div></div>
+<div style=${{padding:"20px 24px 0"}}><div style=${{fontSize:24,fontWeight:700,color:C.dk,lineHeight:1.2}}>De quoi avez-vous besoin aujourd'hui ?</div></div>
+<div style=${{margin:"16px 24px",background:C.w,border:"1.5px solid "+C.bd,borderRadius:16,padding:"14px 18px",display:"flex",alignItems:"center",gap:12}}><${Ic} d=${icp.search} sz=${18} cl=${C.lt}/><input placeholder="Décrivez votre problème..." value=${srch} onChange=${function(e){setSrch(e.target.value)}} style=${{border:"none",outline:"none",background:"transparent",flex:1,fontSize:15,color:C.dk,fontFamily:"inherit"}}/></div>
+${active.map(function(d){var a=AA.find(function(x){return x.id===d.aid});return html`<div key=${d.id} style=${{margin:"0 24px 8px",...cd,padding:"14px 16px",cursor:"pointer"}} onClick=${function(){go("dossier")}}>
+<div style=${{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}><div style=${{display:"flex",alignItems:"center",gap:8}}><${Av} ini=${a.ini} cl=${a.cl} sz=${30}/><div><div style=${{fontSize:13,fontWeight:600,color:C.dk}}>${d.title}</div><div style=${{fontSize:11,color:C.md}}>avec ${a.sh}</div></div></div><span style=${{fontSize:10,padding:"3px 10px",borderRadius:999,fontWeight:500,background:d.st==="progress"?"#EFF7F1":"#FEF8F0",color:d.st==="progress"?C.gn:"#B8860B"}}>${d.st==="progress"?"En cours":"En attente"}</span></div>
+<${Bar} pct=${d.pct}/><div style=${{fontSize:11,color:C.cm,marginTop:6,fontWeight:500}}>${d.next}</div></div>`})}
+<div style=${{padding:"12px 24px 0"}}><div style=${{fontSize:14,fontWeight:700,color:C.dk,marginBottom:10}}>Catégories</div>
+<div style=${{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>${cats.map(function(c){return html`<div key=${c.id} onClick=${function(){go("srch",c)}} style=${{...cd,padding:"16px 8px",display:"flex",flexDirection:"column",alignItems:"center",gap:7,cursor:"pointer"}}><div style=${{width:38,height:38,borderRadius:12,background:C.cr,display:"flex",alignItems:"center",justifyContent:"center"}}><${Ic} d=${icp[c.k]} sz=${18}/></div><div style=${{fontSize:11.5,fontWeight:600,color:C.dk,textAlign:"center",lineHeight:1.25}}>${c.n}</div></div>`})}</div>
+${!srch&&html`<div onClick=${function(){setShowAll(!showAll)}} style=${{textAlign:"center",marginTop:10,fontSize:12,color:C.cm,fontWeight:500,cursor:"pointer"}}>${showAll?"Réduire":"Voir tout"}</div>`}
+</div>
+<div style=${{padding:"20px 24px"}}><div style=${{fontSize:14,fontWeight:700,color:C.dk,marginBottom:10}}>Aidants les mieux notés</div>
+<div style=${{display:"flex",gap:10,overflowX:"auto",paddingBottom:4}}>${AA.map(function(a){return html`<div key=${a.id} onClick=${function(){go("prof",null,a)}} style=${{minWidth:155,...cd,padding:"16px 14px",display:"flex",flexDirection:"column",gap:6,cursor:"pointer"}}>
+<div style=${{display:"flex",alignItems:"center",gap:8}}><${Av} ini=${a.ini} cl=${a.cl} sz=${38} on=${a.on}/><div><div style=${{fontSize:12.5,fontWeight:600,color:C.dk}}>${a.sh}</div><div style=${{fontSize:10.5,color:C.lt}}>dès ${a.p}€</div></div></div>
+<div style=${{fontSize:10.5,color:C.md}}>${a.sp}</div>
+<div style=${{fontSize:11,fontWeight:600,color:C.dk}}><span style=${{color:C.cm}}>★</span> ${a.r} <span style=${{fontWeight:400,color:C.lt}}>${a.rv} avis</span></div></div>`})}</div></div>
+<${NavBar}/>
+</div>`}
+
+// SEARCH
+if(sc==="srch"||sc==="srchT"){
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:90}}>
+<div style=${{padding:"20px 24px 0"}}>${cat?html`<div style=${{display:"flex",alignItems:"center",gap:10,marginBottom:12}}><div onClick=${function(){go("home")}} style=${{width:36,height:36,borderRadius:"50%",background:C.w,border:"1px solid "+C.bd,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><${Ic} d=${icp.back} sz=${18} cl=${C.dk} sw=${2.5}/></div><div style=${{fontSize:17,fontWeight:600,color:C.dk}}>${cat.n}</div></div>`:html`<div style=${{fontSize:22,fontWeight:700,color:C.dk,marginBottom:12}}>Trouver un aidant</div>`}</div>
+<div style=${{padding:"4px 24px"}}>${AA.map(function(a){return html`<div key=${a.id} onClick=${function(){go("prof",null,a)}} style=${{...cd,padding:16,marginBottom:10,cursor:"pointer"}}><div style=${{display:"flex",gap:12}}><${Av} ini=${a.ini} cl=${a.cl} sz=${52} on=${a.on}/><div style=${{flex:1}}><div style=${{fontSize:15,fontWeight:600,color:C.dk}}>${a.nm}</div><div style=${{fontSize:12,color:C.md,marginTop:2}}>${a.sp}</div><div style=${{display:"flex",alignItems:"center",gap:8,marginTop:4}}><span style=${{fontSize:12,fontWeight:600,color:C.dk}}><span style=${{color:C.cm}}>★</span> ${a.r}</span><span style=${{fontSize:11,color:C.lt}}>${a.rv} avis</span><span style=${{marginLeft:"auto",fontSize:16,fontWeight:700,color:C.cm}}>dès ${a.p}€</span></div></div></div></div>`})}</div>
+<${NavBar}/></div>`}
+
+// AIDANT PROFILE
+if(sc==="prof"&&aid){
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:90}}>
+<div style=${{padding:"20px 24px",display:"flex",alignItems:"center",gap:12}}><div onClick=${function(){go("home")}} style=${{width:36,height:36,borderRadius:"50%",background:C.w,border:"1px solid "+C.bd,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><${Ic} d=${icp.back} sz=${18} cl=${C.dk} sw=${2.5}/></div><span style=${{fontSize:17,fontWeight:600,color:C.dk}}>Profil</span></div>
+<div style=${{padding:"0 24px 20px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center"}}>
+<${Av} ini=${aid.ini} cl=${aid.cl} sz=${80} on=${aid.on}/><div style=${{fontSize:21,fontWeight:700,color:C.dk,marginTop:8}}>${aid.nm}</div><div style=${{fontSize:13,color:C.md,marginTop:2}}>${aid.sp}</div>
+<div style=${{display:"flex",gap:20,marginTop:12}}>${[{v:"★ "+aid.r,l:"Note"},{v:aid.rv,l:"Avis"},{v:aid.ss,l:"Séances"},{v:aid.sat+"%",l:"Satisfaction"}].map(function(s,i){return html`<div key=${i}><div style=${{fontSize:16,fontWeight:700,color:C.dk}}>${s.v}</div><div style=${{fontSize:10,color:C.lt}}>${s.l}</div></div>`})}</div>
+<button onClick=${function(){go("bok")}} style=${{...btnS,marginTop:16}}>Réserver une séance</button></div>
+<div style=${{padding:"0 24px 16px"}}><div style=${{fontSize:14,fontWeight:700,color:C.dk,marginBottom:8}}>À propos</div><div style=${{fontSize:13,color:C.md,lineHeight:1.6}}>${aid.bio}</div></div>
+<div style=${{padding:"0 24px 16px"}}><div style=${{fontSize:14,fontWeight:700,color:C.dk,marginBottom:8}}>Tarifs</div>${aid.md.map(function(m){return html`<div key=${m.m} style=${{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 14px",marginBottom:6,background:C.cr,borderRadius:12}}><div><div style=${{fontSize:13,fontWeight:500,color:C.dk}}>${m.m}</div><div style=${{fontSize:11,color:C.lt}}>${m.d}</div></div><span style=${{fontSize:15,fontWeight:700,color:C.cm}}>${m.p}€</span></div>`})}</div>
+<div style=${{padding:"0 24px 16px"}}><div style=${{fontSize:14,fontWeight:700,color:C.dk,marginBottom:8}}>Avis</div>${aid.av.map(function(r,i){return html`<div key=${i} style=${{...cd,padding:14,marginBottom:8}}><div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:6}}><${Av} ini=${r.i} cl=${r.c} sz=${30}/><div style=${{flex:1}}><div style=${{fontSize:12.5,fontWeight:600,color:C.dk}}>${r.n}</div><div style=${{fontSize:10,color:C.lt}}>${r.d}</div></div><span style=${{color:C.cm,fontSize:11}}>${"★".repeat(r.s)}</span></div><div style=${{fontSize:12.5,color:C.md,lineHeight:1.5}}>${r.t}</div></div>`})}</div>
+<${NavBar}/></div>`}
+
+// BOOKING
+if(sc==="bok"&&aid){
+var isInst=mode==="instant";
+var prices={visio:20,presentiel:25,tel:12,chat:8,depot:15,forfait:45,instant:30};
+var selP=prices[mode]||20;var fee=Math.round(selP*.1);
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:20}}>
+<div style=${{padding:"20px 24px",display:"flex",alignItems:"center",gap:12}}><div onClick=${function(){go("prof")}} style=${{width:36,height:36,borderRadius:"50%",background:C.w,border:"1px solid "+C.bd,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><${Ic} d=${icp.back} sz=${18} cl=${C.dk} sw=${2.5}/></div><span style=${{fontSize:17,fontWeight:600,color:C.dk}}>Réserver</span></div>
+<div style=${{padding:"0 24px 14px",display:"flex",alignItems:"center",gap:12}}><${Av} ini=${aid.ini} cl=${aid.cl} sz=${44}/><div><div style=${{fontSize:16,fontWeight:600,color:C.dk}}>${aid.nm}</div><div style=${{fontSize:12,color:C.md}}><span style=${{color:C.cm}}>★</span> ${aid.r}</div></div></div>
+<div style=${{padding:"0 24px"}}><div style=${{fontSize:13,fontWeight:600,color:C.dk,marginBottom:8}}>Mode</div>
+${[{id:"visio",n:"Visio",p:20},{id:"tel",n:"Téléphone",p:12},{id:"chat",n:"Chat",p:8},{id:"depot",n:"Dépôt",p:15}].map(function(m){return html`<div key=${m.id} onClick=${function(){setMode(m.id)}} style=${{display:"flex",alignItems:"center",padding:"12px 14px",marginBottom:6,borderRadius:12,background:mode===m.id?C.cr:C.w,border:"1.5px solid "+(mode===m.id?C.cm:C.bd),cursor:"pointer"}}><div style=${{flex:1,fontSize:13,fontWeight:600,color:C.dk}}>${m.n}</div><span style=${{fontSize:14,fontWeight:700,color:C.cm}}>${m.p}€</span></div>`})}
+<div onClick=${function(){setMode("instant")}} style=${{display:"flex",alignItems:"center",padding:"12px 14px",marginBottom:6,borderRadius:12,background:isInst?"#FDF0EC":C.w,border:"1.5px solid "+(isInst?C.rd:C.bd),cursor:"pointer"}}><div style=${{flex:1}}><div style=${{fontSize:13,fontWeight:600,color:C.rd}}>Instantané</div><div style=${{fontSize:11,color:C.lt}}>Un aidant vous rappelle en moins de 10 min</div></div><span style=${{fontSize:14,fontWeight:700,color:C.rd}}>30€</span></div>
+${!isInst&&html`<div><div style=${{fontSize:13,fontWeight:600,color:C.dk,margin:"16px 0 8px"}}>Date</div>
+<div style=${{display:"flex",gap:6,overflowX:"auto"}}>${DT.map(function(d,i){return html`<div key=${i} onClick=${function(){setDt(i)}} style=${{minWidth:44,padding:"8px 4px",borderRadius:12,background:dt===i?C.cm:C.w,border:"1px solid "+(dt===i?C.cm:C.bd),textAlign:"center",cursor:"pointer"}}><div style=${{fontSize:10,color:dt===i?"rgba(255,255,255,.65)":C.lt}}>${d.d}</div><div style=${{fontSize:15,fontWeight:700,color:dt===i?C.w:C.dk}}>${d.n}</div></div>`})}</div>
+<div style=${{fontSize:13,fontWeight:600,color:C.dk,margin:"16px 0 8px"}}>Heure</div>
+<div style=${{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:5}}>${TMS.map(function(t){return html`<div key=${t} onClick=${function(){if(dis.indexOf(t)<0)setTm(t)}} style=${{padding:"9px",borderRadius:10,background:tm===t?C.cm:C.w,border:"1px solid "+(tm===t?C.cm:C.bd),textAlign:"center",fontSize:13,fontWeight:500,color:tm===t?C.w:dis.indexOf(t)>=0?C.vl:C.dk,cursor:dis.indexOf(t)>=0?"not-allowed":"pointer",opacity:dis.indexOf(t)>=0?.3:1}}>${t}</div>`})}</div></div>`}
+${isInst&&html`<div style=${{margin:"16px 0",padding:16,background:"#FEF6F3",borderRadius:14,textAlign:"center"}}><div style=${{fontSize:14,fontWeight:600,color:C.rd,marginBottom:4}}>Mode instantané</div><div style=${{fontSize:12,color:C.md}}>Un aidant disponible vous contactera dans les prochaines minutes.</div></div>`}
+</div>
+<div style=${{margin:"16px 24px",...cd,padding:14}}><div style=${{display:"flex",justifyContent:"space-between",fontSize:13,padding:"3px 0"}}><span style=${{color:C.md}}>Séance</span><span style=${{fontWeight:600}}>${selP}€</span></div><div style=${{display:"flex",justifyContent:"space-between",fontSize:13,padding:"3px 0"}}><span style=${{color:C.md}}>Frais de service</span><span style=${{fontWeight:600}}>${fee}€</span></div><div style=${{height:1,background:C.bd,margin:"8px 0"}}/><div style=${{display:"flex",justifyContent:"space-between"}}><span style=${{fontSize:15,fontWeight:600}}>Total</span><span style=${{fontSize:18,fontWeight:700,color:C.cm}}>${selP+fee}€</span></div></div>
+<div style=${{padding:"0 24px 24px"}}><button onClick=${function(){go("conf")}} style=${btnS}>Confirmer et payer</button></div></div>`}
+
+// CONFIRMATION
+if(sc==="conf"&&aid){
+var isInst=mode==="instant";
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,padding:"50px 24px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center"}}>
+<div style=${{width:72,height:72,borderRadius:"50%",background:"#EFF7F1",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20}}><${Ic} d=${icp.check} sz=${36} cl=${C.gn} sw=${2.5}/></div>
+<div style=${{fontSize:22,fontWeight:700,color:C.dk}}>${isInst?"Demande envoyée !":"C'est réservé !"}</div>
+<div style=${{fontSize:14,color:C.md,marginTop:6,lineHeight:1.5,maxWidth:300}}>${isInst?"Un aidant disponible va vous contacter dans les prochaines minutes.":aid.nm+" va préparer votre dossier. Vous recevrez un rappel 1h avant."}</div>
+<button onClick=${function(){go("home")}} style=${{...btnOS,marginTop:30}}>Retour à l'accueil</button></div>`}
+
+// MESSAGES
+if(sc==="msgL"){
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:90}}>
+<div style=${{padding:"20px 24px"}}><div style=${{fontSize:22,fontWeight:700,color:C.dk}}>Messages</div></div>
+<div style=${{padding:"0 24px"}}>${CONVOS.map(function(c,i){var a=AA.find(function(x){return x.id===c.aid});return html`<div key=${i} onClick=${function(){go("cht",null,a)}} style=${{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderBottom:"1px solid "+C.cr,cursor:"pointer"}}><${Av} ini=${a.ini} cl=${a.cl} sz=${48} on=${a.on}/><div style=${{flex:1,minWidth:0}}><div style=${{display:"flex",justifyContent:"space-between"}}><span style=${{fontSize:13.5,fontWeight:600,color:C.dk}}>${a.nm}</span><span style=${{fontSize:10.5,color:C.lt}}>${c.t}</span></div><div style=${{fontSize:12,color:C.md,marginTop:2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>${c.msg}</div></div>${c.u>0&&html`<div style=${{width:20,height:20,borderRadius:"50%",background:C.cm,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:600,color:C.w}}>${c.u}</div>`}</div>`})}</div>
+<${NavBar}/></div>`}
+
+// CHAT
+if(sc==="cht"&&aid){
+return html`<div style=${{maxWidth:430,margin:"0 auto",height:"100vh",background:C.bg,display:"flex",flexDirection:"column"}}>
+<div style=${{padding:"14px 24px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid "+C.bd}}><div onClick=${function(){go("msgL")}} style=${{width:36,height:36,borderRadius:"50%",background:C.w,border:"1px solid "+C.bd,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><${Ic} d=${icp.back} sz=${18} cl=${C.dk} sw=${2.5}/></div><${Av} ini=${aid.ini} cl=${aid.cl} sz=${36} on=${aid.on}/><div><div style=${{fontSize:14,fontWeight:600,color:C.dk}}>${aid.nm}</div><div style=${{fontSize:10.5,color:aid.on?C.gn:C.lt}}>${aid.on?"En ligne":"Hors ligne"}</div></div></div>
+<div style=${{flex:1,overflowY:"auto",padding:"14px 24px"}}>
+<div style=${{padding:"8px 12px",borderRadius:"14px 14px 14px 4px",background:C.w,border:"1px solid "+C.bd,marginBottom:8,maxWidth:"80%"}}><div style=${{fontSize:13,color:C.dk}}>Bonjour ! Comment puis-je vous aider ?</div></div>
+</div>
+<div style=${{padding:"10px 24px 28px",borderTop:"1px solid "+C.bd,display:"flex",gap:8}}><div style=${{flex:1,background:C.w,border:"1px solid "+C.bd,borderRadius:999,padding:"10px 16px"}}><input placeholder="Votre message..." style=${{border:"none",outline:"none",background:"transparent",width:"100%",fontSize:13.5,color:C.dk,fontFamily:"inherit"}}/></div><div style=${{width:40,height:40,borderRadius:"50%",background:C.cm,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><${Ic} d=${icp.send} sz=${16} cl="#fff"/></div></div></div>`}
+
+// RATING
+if(sc==="rate"){
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,padding:"44px 24px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center"}}>
+<${Av} ini=${aid.ini} cl=${aid.cl} sz=${64}/><div style=${{fontSize:20,fontWeight:700,color:C.dk,marginTop:12}}>Séance terminée</div>
+<div style=${{display:"flex",gap:8,marginTop:20}}>${[1,2,3,4,5].map(function(i){return html`<div key=${i} onClick=${function(){setStars(i)}} style=${{fontSize:32,cursor:"pointer",color:i<=stars?C.cm:C.bd}}>★</div>`})}</div>
+<textarea placeholder="Votre avis..." style=${{width:"100%",marginTop:20,padding:14,borderRadius:14,border:"1px solid "+C.bd,fontSize:13,fontFamily:"inherit",minHeight:80,resize:"none",outline:"none",boxSizing:"border-box"}}/>
+<button onClick=${function(){go("home")}} style=${{...btnS,marginTop:18,opacity:stars?1:.4}}>Publier</button></div>`}
+
+// MY PROFILE
+if(sc==="myProf"){
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:90}}>
+<div style=${{padding:"20px 24px"}}><div style=${{fontSize:22,fontWeight:700,color:C.dk}}>Mon espace</div></div>
+<div style=${{padding:"0 24px 16px",display:"flex",alignItems:"center",gap:14}}><${Av} ini="LH" cl=${C.cm} sz=${56}/><div><div style=${{fontSize:17,fontWeight:700,color:C.dk}}>Louiza Hadid</div><div style=${{fontSize:12,color:C.md}}>Lorient</div></div></div>
+<div style=${{margin:"0 24px 16px",display:"flex",background:C.cr,borderRadius:999,padding:3}}>
+<div onClick=${function(){setIsAid(false);setTab("home");setSc("home")}} style=${{flex:1,padding:"10px",borderRadius:999,textAlign:"center",fontSize:13,fontWeight:600,cursor:"pointer",background:!isAid?C.w:"transparent",color:!isAid?C.dk:C.lt}}>Demandeur</div>
+<div onClick=${function(){setIsAid(true);setTab("dash");setSc("aidDash")}} style=${{flex:1,padding:"10px",borderRadius:999,textAlign:"center",fontSize:13,fontWeight:600,cursor:"pointer",background:isAid?C.w:"transparent",color:isAid?C.dk:C.lt}}>Aidant</div></div>
+<div style=${{padding:"0 24px"}}>${["Mes dossiers","Mes documents","Mes favoris","Notifications","Paramètres","Aide","Déconnexion"].map(function(l,i){return html`<div key=${i} style=${{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 0",borderBottom:"1px solid "+C.cr,cursor:i===6?"default":"pointer"}}><span style=${{fontSize:14,fontWeight:500,color:i===6?C.rd:C.dk}}>${l}</span>${i<6&&html`<${Ic} d=${icp.chev} sz=${14} cl=${C.lt}/>`}</div>`})}</div>
+<${NavBar}/></div>`}
+
+// AIDANT DASHBOARD
+if(sc==="aidDash"){
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:90}}>
+<div style=${{padding:"20px 24px",display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}><div><div style=${{fontSize:22,fontWeight:700,color:C.dk}}>Tableau de bord</div><div style=${{fontSize:12,color:C.gn,fontWeight:500,marginTop:2}}>Mode aidant</div></div><${ModeBtn}/></div>
+<div style=${{padding:"0 24px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18}}>
+${[{v:"1 240€",l:"Revenus",c:C.cm},{v:"47",l:"Séances",c:C.dk},{v:"★ 4.9",l:"Note",c:C.cm},{v:"12",l:"Ce mois",c:C.dk}].map(function(k,i){return html`<div key=${i} style=${{...cd,padding:16,textAlign:"center"}}><div style=${{fontSize:22,fontWeight:700,color:k.c}}>${k.v}</div><div style=${{fontSize:10.5,color:C.lt,marginTop:2}}>${k.l}</div></div>`})}</div>
+<div style=${{padding:"0 24px"}}><div style=${{fontSize:15,fontWeight:700,color:C.dk,marginBottom:10}}>Prochaines séances</div>
+${[{n:"Julie D.",d:"Ven 21 · 15:00",m:"Visio"},{n:"Pierre M.",d:"Sam 22 · 10:00",m:"Tél"},{n:"Nadia C.",d:"Lun 24 · 14:00",m:"Présentiel"}].map(function(b,i){return html`<div key=${i} style=${{...cd,padding:14,marginBottom:8,display:"flex",alignItems:"center",gap:12}}><${Av} ini=${b.n.split(" ").map(function(w){return w[0]}).join("")} cl=${["#A67B52","#5C8A84","#7D6B99"][i]} sz=${38}/><div style=${{flex:1}}><div style=${{fontSize:13,fontWeight:600,color:C.dk}}>${b.n}</div><div style=${{fontSize:11.5,color:C.md}}>${b.d} · ${b.m}</div></div></div>`})}</div>
+<${NavBar}/></div>`}
+
+// DOSSIER DETAIL
+if(sc==="dossier"){
+var d=DOSS[0];var a=AA.find(function(x){return x.id===d.aid});
+var steps=[{t:"Dossier ouvert",ok:true},{t:"Documents envoyés",ok:true},{t:"Analyse par Sophie",ok:true},{t:"Visio de finalisation",ok:false},{t:"Déclaration soumise",ok:false}];
+return html`<div style=${{maxWidth:430,margin:"0 auto",minHeight:"100vh",background:C.bg,paddingBottom:40}}>
+<div style=${{padding:"20px 24px",display:"flex",alignItems:"center",gap:12}}><div onClick=${function(){go("home")}} style=${{width:36,height:36,borderRadius:"50%",background:C.w,border:"1px solid "+C.bd,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}><${Ic} d=${icp.back} sz=${18} cl=${C.dk} sw=${2.5}/></div><span style=${{fontSize:17,fontWeight:600,color:C.dk}}>Suivi</span></div>
+<div style=${{padding:"0 24px"}}><div style=${{...cd,padding:16,marginBottom:14}}><div style=${{fontSize:17,fontWeight:700,color:C.dk,marginBottom:3}}>${d.title}</div><div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:10}}><${Av} ini=${a.ini} cl=${a.cl} sz=${26}/><span style=${{fontSize:12,color:C.md}}>avec ${a.nm}</span></div><${Bar} pct=${d.pct}/><div style=${{display:"flex",justifyContent:"space-between",marginTop:6}}><span style=${{fontSize:11,color:C.lt}}>Progression</span><span style=${{fontSize:11,fontWeight:600,color:C.cm}}>${d.pct}%</span></div></div>
+<div style=${{fontSize:14,fontWeight:700,color:C.dk,marginBottom:10}}>Étapes</div>
+${steps.map(function(s,i){return html`<div key=${i} style=${{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<4?"1px solid "+C.cr:"none"}}><div style=${{width:22,height:22,borderRadius:"50%",border:"2px solid "+(s.ok?C.gn:C.bd),background:s.ok?C.gn:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>${s.ok&&html`<${Ic} d=${icp.check} sz=${12} cl="#fff" sw=${3}/>`}</div><span style=${{fontSize:13,color:s.ok?C.dk:C.lt}}>${s.t}</span></div>`})}
+</div></div>`}
+
+// DEFAULT
+return html`<div style=${{maxWidth:430,margin:"0 auto",padding:40,textAlign:"center",color:C.lt}}>Chargement...</div>`
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script></body></html>
